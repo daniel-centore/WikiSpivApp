@@ -8,7 +8,7 @@
              Title="Cats">
     <ContentPage.Resources>
         <Style TargetType="Grid">
-            <Setter Property="VisualStateManager.VisualStateGroups">
+            <!--<Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CommonStates">
                         <VisualState x:Name="Normal" />
@@ -20,7 +20,7 @@
                         </VisualState>
                     </VisualStateGroup>
                 </VisualStateGroupList>
-            </Setter>
+            </Setter>-->
         </Style>
     </ContentPage.Resources>
 
@@ -37,5 +37,7 @@
                     ItemsSource="{Binding ListItems}"
                     ItemTemplate="{StaticResource WSSongTemplate}"
                     SelectionMode="Single"
-                    SelectionChanged="OnCollectionViewSelectionChanged" />
+                    SelectionChanged="OnCollectionViewSelectionChanged"
+                    BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundColorDark}, 
+                        Light={StaticResource BackgroundColorLight}}"/>
 </ContentPage>

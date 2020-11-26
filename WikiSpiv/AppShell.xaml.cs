@@ -18,7 +18,7 @@ namespace WikiSpiv
         public ICommand HelpCommand => new Command<string>(async (url) => await Launcher.OpenAsync(url));
         public ICommand RandomPageCommand => new Command(async () => await NavigateToRandomPageAsync());
 
-        public AppShell()
+        public AppShell() 
         {
             InitializeComponent();
             RegisterRoutes();

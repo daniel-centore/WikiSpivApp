@@ -48,7 +48,7 @@ namespace WikiSpiv.Data
                 //await Database.DeleteAllAsync<WikiSpivItem>();  // TODO: Remove
 
                 List<WikiSpivItem> dbItems = await Database.Table<WikiSpivItem>().ToListAsync();
-                UpdateItems(
+                await UpdateItems(
                     dbItems,
                     true,  // replaceExisting
                     false  // updateDb
