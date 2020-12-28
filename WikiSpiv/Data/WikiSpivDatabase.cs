@@ -16,6 +16,8 @@ namespace WikiSpiv.Data
 {
     public class WikiSpivDatabase
     {
+        public const string ORDER = " -0123456789АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯЬABCDEFGHIJKLMNOPQRSTUVWXYZ?";
+
         static readonly Lazy<SQLiteAsyncConnection> lazyInitializer = new Lazy<SQLiteAsyncConnection>(() =>
         {
             return new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
@@ -24,8 +26,8 @@ namespace WikiSpiv.Data
         static SQLiteAsyncConnection Database => lazyInitializer.Value;
         static bool initialized = false;
 
-        static readonly ObservableRangeCollection<WikiSpivItem> wikiSpivItems = new ObservableRangeCollection<WikiSpivItem>();
-        public static ObservableRangeCollection<WikiSpivItem> WikiSpivItems { get { return wikiSpivItems; } }
+        static readonly ObservableRangeCollection<SongListGroup> wikiSpivItems = new ObservableRangeCollection<SongListGroup>();
+        public static ObservableRangeCollection<SongListGroup> WikiSpivItems { get { return wikiSpivItems; } }
 
         
         public WikiSpivDatabase()
@@ -107,6 +109,7 @@ namespace WikiSpiv.Data
                 PaginationSize = 500
             };
             var results = await allPagesGenerator.EnumItemsAsync().ToListAsync().ConfigureAwait(false);
+
             Console.WriteLine("Got " + results.Count + " results");
 
             List<WikiSpivItem> wsItems = new List<WikiSpivItem>();
@@ -195,26 +198,39 @@ namespace WikiSpiv.Data
         /// <returns></returns>
         private static async Task UpdateItems(List<WikiSpivItem> items, bool replaceExisting, bool updateDb = true)
         {
-            items.Sort((a, b) => a.Name.CompareTo(b.Name));
+            items.Sort();
 
             List<WikiSpivItem> newItems = new List<WikiSpivItem>();
+            List<WikiSpivItem> existingItems = wikiSpivItems.SelectMany(x => x).ToList();
 
             // This will only include items which are present in the new items list
             foreach (WikiSpivItem item in items)
             {
-                WikiSpivItem existing = wikiSpivItems.FirstOrDefault(i => i.Name == item.Name && i.Type == item.Type);
+                WikiSpivItem existing = existingItems.FirstOrDefault(i => i.Name == item.Name && i.Type == item.Type);
                 if (existing != null && !replaceExisting)
                     newItems.Add(existing);
                 else
                     newItems.Add(item);
             }
 
-            wikiSpivItems.ReplaceRange(newItems);
+            List<SongListGroup> newGroupItems = new List<SongListGroup>();
+            foreach (WikiSpivItem item in newItems)
+            {
+                string letter = item.Name.Substring(0, 1);
+                SongListGroup group = newGroupItems.FirstOrDefault(group => group.Letter == letter);
+                if (group == null)
+                {
+                    group = new SongListGroup { Letter = letter };
+                    newGroupItems.Add(group);
+                }
+                group.Add(item);
+            }
+            wikiSpivItems.ReplaceRange(newGroupItems);
 
             if (updateDb)
             {
                 await Database.DeleteAllAsync<WikiSpivItem>();
-                foreach (WikiSpivItem item in wikiSpivItems)
+                foreach (WikiSpivItem item in newItems)
                 {
                     await SaveItemToDbAsync(item);
                 }
@@ -267,4 +283,11 @@ namespace WikiSpiv.Data
         //}
 
     }
+
+    public class SongListGroup : List<WikiSpivItem>
+    {
+        public string Letter { get; set; }
+        public static IList<WikiSpivItem> All { private set; get; }
+    }
+
 }

@@ -8,7 +8,11 @@ namespace WikiSpiv.CustomViews
     /// iOS
     ///  - Disables update animations (they were buggy and looked terrible)
     /// </summary>
-    public class CustomCollectionView : CollectionView
+    public class CustomListView : ListView
     {
+
+        public CustomListView(): base(ListViewCachingStrategy.RecycleElement)
+        {
+        }
     }
 }

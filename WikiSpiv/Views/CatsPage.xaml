@@ -5,7 +5,8 @@
              xmlns:data="clr-namespace:WikiSpiv.Data"
              xmlns:views="clr-namespace:WikiSpiv.Views" xmlns:customviews="clr-namespace:WikiSpiv.CustomViews"
              x:Class="WikiSpiv.Views.CatsPage"
-             Title="Cats">
+             Title="Cats"
+             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core">
     <ContentPage.Resources>
         <Style TargetType="Grid">
             <!--<Setter Property="VisualStateManager.VisualStateGroups">
@@ -31,13 +32,38 @@
                                       Animals="{x:Static data:CatData.Cats}"
                                       SelectedItemNavigationTarget="{x:Type views:CatDetailPage}" />
     </Shell.SearchHandler>-->
-    
-    <customviews:CustomCollectionView x:Name="ListView"
-                    Margin="20"
-                    ItemsSource="{Binding ListItems}"
-                    ItemTemplate="{StaticResource WSSongTemplate}"
-                    SelectionMode="Single"
-                    SelectionChanged="OnCollectionViewSelectionChanged"
-                    BackgroundColor="{AppThemeBinding Dark={StaticResource BackgroundColorDark}, 
-                        Light={StaticResource BackgroundColorLight}}"/>
+
+
+
+    <!-- Caching strategy defined in CustomListView -->
+    <customviews:CustomListView x:Name="ListView"
+              IsGroupingEnabled="true"
+              GroupDisplayBinding="{Binding Letter}"
+              GroupShortNameBinding="{Binding Letter}"
+              SeparatorColor="Gray"
+              VerticalOptions="FillAndExpand"
+              android:ListView.IsFastScrollEnabled="true">
+        <ListView.GroupHeaderTemplate>
+            <DataTemplate>
+                <TextCell
+                    Text="{Binding Letter}"
+                    TextColor="Gray"/>
+            </DataTemplate>
+        </ListView.GroupHeaderTemplate>
+        <ListView.ItemTemplate>
+				<DataTemplate>
+                    <TextCell
+                        Text="{Binding Name}"
+                        TextColor="{AppThemeBinding Dark={StaticResource ForegroundColorDark}, 
+                            Light={StaticResource ForegroundColorLight}}"/>
+					<!--<ViewCell>
+						<StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
+							<StackLayout Orientation="Vertical">
+								<Label Text = "{Binding Name}" FontSize="24" AbsoluteLayout.LayoutBounds="0.25, 0.25, 400, 40" LineBreakMode="TailTruncation"/>
+							</StackLayout>
+						</StackLayout>
+					</ViewCell>-->
+				</DataTemplate>
+			</ListView.ItemTemplate>
+    </customviews:CustomListView>
 </ContentPage>
